@@ -32,15 +32,19 @@ bot.on('message', message => {
     }
   }
   else if (command === "!test"){
-    let argsSpace = 
-    console.log()
+    let argsSpace = args
+    argsSpace.shift()
+    var argsNameAlias = argsSpace.join(' ');
+    console.log(argsNameAlias)
   }
   else if (command === "!alias"){
-    if(message.content.length > 27){
-      if (bot.channels.get(message.content.substring(7, 26))){
-        console.log(message.content.substring(26));
-        stockage.channelAlias[message.content.substring(26)] = message.content.substring(7, 26)
-        message.channel.send(":tools: L'alias du channel" +message.content.substring(7, 26)+" est "+message.content.substring(26))
+    if(args.length > 1){
+      if (bot.channels.get(args[0])){
+        let argsSpace = args
+        argsSpace.shift()
+        let nameAlias = argsSpace.join(' ');
+        stockage.channelAlias[nameAlias.toString()] = args[0]
+        message.channel.send(":tools: L'alias du channel "+args[0].toString()+" est "+nameAlias.toString())
       }else{
         message.channel.send(":warning: Channel non existant !").then(msg => {msg.delete(3000);message.delete(3000)});
       }
@@ -54,9 +58,9 @@ bot.on('message', message => {
 })
 function saveJson(){
   return function(){
-    fs.writeFile('stockage.json',json.stringify(stockage),() => console.log("Sauvegarde du json"))
+    fs.writeFile('stockage.json',JSON.stringify(stockage),() => console.log("Sauvegarde du json"))
   }
 }
 bot.login(TOKEN)
-
-setInterval(saveJson(), 3000000)
+//setInterval(saveJson(), 3000000)
+setInterval(saveJson(), 10000)
