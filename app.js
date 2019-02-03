@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const TOKEN = "MjM5Mzg2MDcwNDYxMDU0OTc4.DquUwQ.Vn8X0tPqmXsW8aqPGvp56qvkoEY";
 const fs = require('fs');
 var stockage = require("./stockage.json");
 
