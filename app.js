@@ -2,7 +2,10 @@ const Discord = require('discord.js');
 const MongoClient = require("mongodb").MongoClient;
 const config = require('./module/variable/config');
 const disUtils = require('./module/utils/discord-utils');
-
+const embedVar = {
+    help : require('./module/variable/help'),
+};
+const messages = require('./module/variable/message');
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
 const client = new MongoClient(config.url_db);
@@ -12,7 +15,7 @@ bot.on('ready', function() {
 });
 
 bot.on('guildMemberAdd', (member) => {
-
+    member.send(messages.JOIN);
 });
 
 client.connect(function(error) {
@@ -272,6 +275,13 @@ bot.on('message', message => {
                 message.delete(0);
             }
             break;
+
+        case "!help":
+            if(message.member.permissions.has("ADMINISTRATOR")){
+                message.reply({embed : embedVar.help});
+            } else {
+                message.delete(0);
+            }
     }
 
 
