@@ -43,7 +43,7 @@ module.exports = {
         },
         {
             "name" : "Modification",
-            "value" : "`!channel role @role`",
+            "value" : "`!channel role @role #channel`",
         },
         {
             "name" : "\u200B",
@@ -52,6 +52,42 @@ module.exports = {
         {
             "name" : "__Déplacement forcé__",
             "value" : "**:warning: Cette commande n'est pas fonctionnelle à 100% et elle peut poser des gros problèmes de permissions** : `!move @user #channel` ",
+        },
+        {
+            "name" : "\u200B",
+            "value" : "\u200B",
+        },
+        {
+            "name" : "__:dollar: L'argent !__",
+            "value" : "Voici toutes les commandes pour la gestion de l'économie",
+        },
+        {
+            "name" : "Déminuer",
+            "value" : "`!money remove @user montant`",
+        },
+        {
+            "name" : "Reset",
+            "value" : "`!money reset @user`",
+        },
+        {
+            "name" : "Augementer",
+            "value" : "`!money add @user montant`",
+        },
+        /**{
+            "name" : "Définir",
+            "value" : "!money set @user montant",
+        },**/
+        {
+            "name" : "__Commandes utilisateur__",
+            "value" : "Différentes commandes pour les joueurs",
+        },
+        {
+            "name" : "Déplacement",
+            "value" : "`*sors pour aller à lieu*`",
+        },
+        {
+            "name" : "Argent",
+            "value" : "`*ouvre sa bourse*`",
         },
     ]
 };

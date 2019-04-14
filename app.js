@@ -1,14 +1,14 @@
 const Discord = require('discord.js');
-const MongoClient = require("mongodb").MongoClient;
 const config = require('./module/variable/config');
 const disUtils = require('./module/utils/discord-utils');
+let dbUtils = require('./module/utils/db-utils');
 const embedVar = {
     help : require('./module/variable/help'),
 };
+
 const messages = require('./module/variable/message');
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
-const client = new MongoClient(config.url_db);
 
 bot.on('ready', function() {
     console.log("Je suis connecté !");
@@ -18,17 +18,17 @@ bot.on('guildMemberAdd', (member) => {
     member.send(messages.JOIN);
 });
 
-client.connect(function(error) {
+dbUtils.client.connect(function(error) {
     if(error) throw error;
-    client.db(config.name_db);
+    dbUtils.client.db(config.NAME_DB);
     console.log("Connecté à la base de donnée du bot");
-    console.log("Nombre de fiche : " + client.db(config.name_db).collection("Fiche").estimatedDocumentCount({}, (err, num) => {
+    console.log("Nombre de fiche : " + dbUtils.client.db(config.NAME_DB).collection("Fiche").estimatedDocumentCount({}, (err, num) => {
         return num
     }))
 });
 
 function changeChannel(destination, msg) {
-    checkRole(destination.id,(state, rsp, msg) => {
+    dbUtils.checkRole(destination.id, (state, rsp) => {
         switch(state) {
             default:
                 break;
@@ -38,98 +38,31 @@ function changeChannel(destination, msg) {
                 break;
 
             case true:
-                if(msg.member.roles.get(rsp)){
+                if(msg.member.roles.get(rsp)) {
                     msg.channel.overwritePermissions(msg.author, {READ_MESSAGES : null}, "Changement de channel (RP)").catch(console.error);
                     destination.overwritePermissions(msg.author, {READ_MESSAGES : true}).catch(console.error);
                 } else {
-                    msg.channel.send(":key2: Je ne peux pas te laisser rentrer dans ce lieu !");
+                    msg.channel.send(messages.CHANNEL_PERM);
                 }
         }
     }, msg);
 }
 
-function checkRole(id, callback, msg) {
-    client.db(config.name_db).collection("Channel").findOne({"channelId" : id}, (err, rsp) => {
-        if(err) {
-            console.error(err, msg);
-            callback(false, msg);
-        } else if(!rsp) callback(false, msg);
-        else if(rsp) callback(true, rsp.role, msg);
-    })
-}
+function startMoney(user) {
+    dbUtils.setMoney(user.id, 300, (data) => {
+        switch(data) {
+            case "nobody" :
+                user.send(messages.MONEY_START.replace("%1", "Libertown").replace("%2", "300"));
+                break;
 
-function addAlias(channelId, alias, callback) {
-    if(alias === "" || alias === " " || !alias) {
-        callback("nobody");
-    } else {
-        client.db(config.name_db).collection("aliasChannel").findOne({"alias" : alias}, (err, rsp) => {
-            if(!rsp) client.db(config.name_db).collection("aliasChannel").insertOne({
-                channelId : channelId,
-                alias : alias
-            }, (err) => {
-                if(err) {
-                    console.error(err);
-                    callback(false)
-                } else {
-                    callback(true)
-                }
-            });
-            else if(err) callback(false);
-            else if(rsp) callback("two")
-        });
-    }
-}
+            case "modify" :
+                user.send(messages.MONEY_START.replace("%1", "Libertown").replace("%2", "300"));
+                break;
 
-function removeAlias(alias, callback) {
-    client.db(config.name_db).collection("aliasChannel").deleteOne({"alias" : alias}, (err, rsp) => {
-        if(err) callback(false);
-        else if(rsp.deletedCount === 0) callback("nobody");
-        else if(rsp.deletedCount === 1) callback(true)
-    })
-}
-
-function addRole(channel, role, callback) {
-    client.db(config.name_db).collection("Channel").findOne({channelId : channel}, (err, rsp) => {
-        if(err) {
-            console.error(err);
-            callback(false)
-        } else if(rsp) {
-            client.db(config.name_db).collection("Channel").updateOne({channelId : channel}, {
-                $set : {
-                    channelId : channel,
-                    role : role
-                }
-            }, (err, rsp) => {
-                if(err) {
-                    console.error(err);
-                    callback(false)
-                } else if(rsp) {
-                    callback("modify");
-                }
-            })
-        } else if(!rsp) {
-            client.db(config.name_db).collection("Channel").insertOne({
-                channelId : channel,
-                role : role
-            }, (err, rsp) => {
-                if(err) {
-                    console.error(err);
-                    callback(false);
-                } else if(rsp) {
-                    callback("add")
-                }
-            })
+            case false:
+                console.error(user.id + " : Erreur lors du don de début !");
+                break;
         }
-    });
-}
-
-function findAias(alias, callback) {
-    client.db(config.name_db).collection("aliasChannel").findOne({"alias" : alias}, (err, rsp) => {
-        if(err) {
-            console.error(err);
-            callback(false);
-        } else if(!rsp) callback("nobody");
-        else if(rsp) callback(true, rsp.channelId);
     })
 }
 
@@ -137,13 +70,13 @@ bot.on('message', message => {
     const args = message.content.split(' ');
     const command = args.shift().toLowerCase();
 
-    if(message.content.startsWith("*sors pour aller à")) {
+    if(message.content.startsWith("*sors pour aller à") && message.content.endsWith("*")) {
         const lieu = message.content.substring(19, message.content.length - 1).toLowerCase();
         const lieuC = message.guild.channels.find(channel => channel.name === lieu) || message.guild.channels.get(lieu);
         if(lieuC) {
             changeChannel(lieuC, message);
         } else {
-            findAias(lieu, (data, rsp) => {
+            dbUtils.findAlias(lieu, (data, rsp) => {
                 const aliasDest = message.guild.channels.get(rsp);
                 switch(data) {
                     case false:
@@ -157,6 +90,22 @@ bot.on('message', message => {
                 }
             })
         }
+    } else if(message.content === "*ouvre sa bourse*" ) {
+        dbUtils.checkMoney(message.author.id, (rsp, money) => {
+            switch(rsp) {
+                case true:
+                    message.author.send(messages.MONEY_BALANCE.replace("%1", money));
+                    break;
+
+                case false:
+                    message.delete(0);
+                    break;
+
+                case "nobody":
+                    message.author.send(messages.MONEY_NOBODY);
+                    break;
+            }
+        })
     }
 
     switch(command) {
@@ -164,7 +113,8 @@ bot.on('message', message => {
             break;
         case "!channel":
             if(!message.guild.available) {
-                message.channel.send(":frowning2: Malheureusement, j'ai l'impression que vous n'êtes pas dans un serveur Discord...")
+                message.channel.send(messages.DM_BLOCK);
+                break;
             }
             if(args.length > 0 && message.member.permissions.has("ADMINISTRATOR")) {
                 let channelID;
@@ -180,23 +130,23 @@ bot.on('message', message => {
                                     channelArgs = message.guild.channels.get(args[2]) || message.guild.channels.find(channel => channel.name === args[2]) || message.guild.channels.get(disUtils.getChannel(args[2]));
                                     if(channelArgs) channelID = channelArgs.id;
                                     else {
-                                        message.channel.send(":frowning2: Le nom de votre channel est incorect...");
+                                        message.channel.send(messages.CHANNEL_INVALID);
                                         return;
                                     }
                                     nameAlias = args.slice(3).join(" ").toLowerCase();
-                                    addAlias(channelID, nameAlias, (data) => {
+                                    dbUtils.addAlias(channelID, nameAlias, (data) => {
                                         switch(data) {
                                             case "nobody":
-                                                message.channel.send(":frowning2: Le nom de votre alias est incorect...");
+                                                message.channel.send(messages.ALIAS_INVALID);
                                                 break;
                                             case true:
-                                                message.channel.send(":tools: L'alias du channel " + channelID.toString() + " est " + nameAlias.toString());
+                                                message.channel.send(messages.ALIAS_MODIFY.replace("%1", channelID.toString()).replace("%2", nameAlias.toString()));
                                                 break;
                                             case "two":
-                                                message.channel.send(":frowning2: Vous avez déjà crée une entrée avec cette alias");
+                                                message.channel.send(messages.ALIAS_EXIST);
                                                 break;
                                             case false:
-                                                message.channel.send(":frowning2: Une erreur inconnu est arrivée");
+                                                message.channel.send(messages.ERROR);
                                                 break;
                                         }
                                     });
@@ -204,16 +154,16 @@ bot.on('message', message => {
 
                                 case "remove" :
                                     nameAlias = args.slice(2).join(" ").toLowerCase();
-                                    removeAlias(nameAlias, (data) => {
+                                    dbUtils.removeAlias(nameAlias, (data) => {
                                         switch(data) {
                                             case true:
-                                                message.channel.send(":tools: L'alias \"" + nameAlias.toString() + "\" à bien été supprimée");
+                                                message.channel.send(messages.ALIAS_REMOVE.replace("%1", nameAlias.toString()));
                                                 break;
                                             case false:
-                                                message.channel.send(":frowning2: Une erreur inconnu est arrivée");
+                                                message.channel.send(messages.ERROR);
                                                 break;
                                             case "nobody" :
-                                                message.channel.send(":frowning2: Vous avez aucune entrée avec cette alias");
+                                                message.channel.send(messages.ALIAS_NOBODY);
                                                 break;
 
                                         }
@@ -231,27 +181,27 @@ bot.on('message', message => {
                         if(channel) {
                             const role = message.guild.roles.get(args[1]) || message.guild.roles.find(channel => channel.name === args[1]) || message.guild.roles.get(disUtils.getRole(args[1]));
                             if(role) {
-                                addRole(channel.id, role.id, (data) => {
+                                dbUtils.addRole(channel.id, role.id, (data) => {
                                     switch(data) {
                                         case "modify":
-                                            message.channel.send(":tools: Le role " + args[2] + " à été modifié pour le channel : " + args[1]);
+                                            message.channel.send(messages.ROLE_MODIFY.replace("%1", args[1]).replace("%2", args[2]));
                                             break;
 
                                         case "add":
-                                            message.channel.send(":tools: Le role " + args[2] + " à été défini pour le channel : " + args[1]);
+                                            message.channel.send(messages.ROLE_DEFINE.replace("%1", args[1]).replace("%2", args[2]));
                                             break;
 
                                         case false:
-                                            message.channel.send(":frowning2: Une erreur inconnu est arrivée");
+                                            message.channel.send(messages.ERROR);
                                             break;
 
                                     }
                                 })
                             } else {
-                                message.channel.send(":frowning2: Le role n'existe pas !");
+                                message.channel.send(messages.ROLE_INVALID);
                             }
                         } else {
-                            message.channel.send(":frowning2: Le channel n'existe pas !");
+                            message.channel.send(messages.CHANNEL_INVALID);
                         }
                 }
             } else {
@@ -259,16 +209,16 @@ bot.on('message', message => {
             }
             break;
         case "!move":
-            if(message.member.permissions.has("ADMINISTRATOR")){
+            if(message.member.permissions.has("ADMINISTRATOR")) {
                 const user = message.guild.members.get(args[0]) || message.guild.members.find(user => user.nickname === args[0]) || message.guild.members.get(disUtils.getChannel(args[0]));
                 const dest = message.guild.channels.get(args[1]) || message.guild.channels.find(channel => channel.name === args[1]) || message.guild.channels.get(disUtils.getChannel(args[1]));
-                if(!dest){
-                    message.channel.send(":frowning2: Le channel n'existe pas !");
-                } else if(!user){
-                    message.channel.send(":frowning2: L'utilisateur n'existe pas !");
-                } else if(user && dest){
+                if(!dest) {
+                    message.channel.send(messages.CHANNEL_INVALID);
+                } else if(!user) {
+                    message.channel.send(messages.USER_INVALID);
+                } else if(user && dest) {
                     const lost = message.guild.channels.find(channel => channel.memberPermissions(user).has("READ_MESSAGES") && channel.memberPermissions(user).has("SEND_MESSAGES") && (channel.type === "text") === true);
-                    lost.overwritePermissions(user, {READ_MESSAGES : null}, "Changement de channel (RP)").catch(console.error);
+                    lost.overwritePermissions(user, {READ_MESSAGES : null}, messages.LOG_MOVE).catch(console.error);
                     dest.overwritePermissions(user, {READ_MESSAGES : true}).catch(console.error);
                 }
             } else {
@@ -277,10 +227,118 @@ bot.on('message', message => {
             break;
 
         case "!help":
-            if(message.member.permissions.has("ADMINISTRATOR")){
+            if(message.member.permissions.has("ADMINISTRATOR")) {
                 message.reply({embed : embedVar.help});
             } else {
                 message.delete(0);
+            }
+            break;
+
+        case "!money":
+            let user;
+            let nbMoney;
+            if(!message.guild.available) {
+                message.channel.send(messages.DM_BLOCK);
+                break;
+            }
+            if(message.member.permissions.has("ADMINISTRATOR")) {
+                switch(args[0]) {
+                    default:
+                        break;
+
+                    case "add":
+                        user = message.guild.members.get(args[1]) || message.guild.members.find(user => user.nickname === args[1]) || message.guild.members.get(disUtils.getChannel(args[1]));
+                        nbMoney = Number(args[2]);
+                        if(!user) {
+                            message.channel.send(messages.USER_INVALID);
+                            break;
+                        } else if(isNaN(nbMoney)) {
+                            message.channel.send(messages.NAN);
+                            break;
+                        } else {
+                            dbUtils.modifyMoney(user.id, nbMoney, (rsp) => {
+                                switch(rsp) {
+                                    case false:
+                                        message.channel.send(messages.ERROR);
+                                        break;
+
+                                    case "add":
+                                        message.channel.send(messages.MONEY_START_ADMIN.replace("%2", nbMoney.toString()).replace("%1", args[1]));
+                                        break;
+
+                                    case "modify":
+                                        message.channel.send(messages.MONEY_ADD.replace("%2", nbMoney.toString()).replace("%1", args[1]));
+                                        break;
+                                }
+                            })
+                        }
+                        break;
+
+                    case "remove":
+                        user = message.guild.members.get(args[1]) || message.guild.members.find(user => user.nickname === args[1]) || message.guild.members.get(disUtils.getChannel(args[1]));
+                        nbMoney = Number(args[2]);
+                        if(!user) {
+                            message.channel.send(messages.USER_INVALID);
+                            break;
+                        } else if(isNaN(nbMoney)) {
+                            message.channel.send(messages.NAN);
+                            break;
+                        } else {
+                            dbUtils.modifyMoney(user.id, -nbMoney, (rsp) => {
+                                switch(rsp) {
+                                    case false:
+                                        message.channel.send(messages.ERROR);
+                                        break;
+
+                                    case "nobody":
+                                        message.channel.send(messages.MONEY_NEGATIVE_ADMIN.replace("%1", args[1]));
+                                        break;
+
+                                    case "modify":
+                                        message.channel.send(messages.MONEY_REMOVE.replace("%2", nbMoney.toString()).replace("%1", args[1]));
+                                        break;
+                                }
+                            })
+                        }
+                        break;
+
+                    case "bal":
+                        user = message.guild.members.get(args[1]) || message.guild.members.find(user => user.nickname === args[1]) || message.guild.members.get(disUtils.getChannel(args[1]));
+                        if(!user) {
+                            message.channel.send(messages.USER_INVALID);
+                            break;
+                        } else {
+                            dbUtils.checkMoney(user.id, (rsp, data) => {
+                                switch(rsp) {
+                                    case false:
+                                        message.channel.send(messages.ERROR);
+                                        break;
+
+                                    case "nobody":
+                                        message.channel.send(messages.MONEY_NOBODY_OTHER.replace("%1", args[1]));
+                                        break;
+
+                                    case true:
+                                        message.channel.send(messages.MONEY_BALANCE_ADMIN.replace("%2", data.toString()).replace("%1", args[1]));
+                                        break;
+                                }
+                            })
+                        }
+                        break;
+
+                    case "reset":
+                        user = message.guild.members.get(args[1]) || message.guild.members.find(user => user.nickname === args[1]) || message.guild.members.get(disUtils.getChannel(args[1]));
+                        if(!user) {
+                            message.channel.send(messages.USER_INVALID);
+                            break;
+                        } else {
+                            startMoney(user);
+                        }
+                        break;
+                }
+            } else {
+                message.delete(0);
+                break;
             }
     }
 
