@@ -32,7 +32,10 @@ module.exports = {
             "name" : "Retrait",
             "value" : "`!channel alias remove NOM_ALIAS`"
         },
-
+        {
+            "name" : "Liste",
+            "value" : "`!channel alias list #channel.`"
+        },
         {
             "name" : "\u200B",
             "value" : "\u200B",
@@ -73,10 +76,18 @@ module.exports = {
             "name" : "Augementer",
             "value" : "`!money add @user montant`",
         },
+        {
+            "name" : "Voir le montant du compte",
+            "value" : "`!money bal @user`",
+        },
         /**{
             "name" : "Définir",
             "value" : "!money set @user montant",
         },**/
+        {
+            "name" : "\u200B",
+            "value" : "\u200B",
+        },
         {
             "name" : "__Commandes utilisateur__",
             "value" : "Différentes commandes pour les joueurs",

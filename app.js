@@ -1,11 +1,12 @@
 const Discord = require('discord.js');
 const config = require('./module/variable/config');
-const disUtils = require('./module/utils/discord-utils');
-let dbUtils = require('./module/utils/db-utils');
+const disUtils = require('./module/utils/discordUtils');
+let dbUtils = require('./module/utils/dbUtils');
 const embedVar = {
     help : require('./module/variable/help'),
 };
 
+const userCommands = require('./module/variable/userCommand');
 const messages = require('./module/variable/message');
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
@@ -15,7 +16,9 @@ bot.on('ready', function() {
 });
 
 bot.on('guildMemberAdd', (member) => {
-    member.send(messages.JOIN);
+    if(!member.user.bot){
+        member.send(messages.JOIN);
+    }
 });
 
 dbUtils.client.connect(function(error) {
@@ -76,7 +79,7 @@ bot.on('message', message => {
         if(lieuC) {
             changeChannel(lieuC, message);
         } else {
-            dbUtils.findAlias(lieu, (data, rsp) => {
+            dbUtils.findChannel(lieu, (data, rsp) => {
                 const aliasDest = message.guild.channels.get(rsp);
                 switch(data) {
                     case false:
@@ -90,7 +93,7 @@ bot.on('message', message => {
                 }
             })
         }
-    } else if(message.content === "*ouvre sa bourse*" ) {
+    } else if(userCommands.money.includes(message.content)) {
         dbUtils.checkMoney(message.author.id, (rsp, money) => {
             switch(rsp) {
                 case true:
@@ -167,7 +170,34 @@ bot.on('message', message => {
                                                 break;
 
                                         }
-                                    })
+                                    });
+                                    break;
+
+                                case "list" :
+                                    channelArgs = message.guild.channels.get(args[2]) || message.guild.channels.find(channel => channel.name === args[2]) || message.guild.channels.get(disUtils.getChannel(args[2]));
+                                    if(!channelArgs){
+                                        message.channel.send(messages.CHANNEL_INVALID)
+                                    } else {
+                                        dbUtils.findAlias(channelArgs.id, (rsp, data) => {
+                                            switch(rsp){
+                                                case "nobody":
+                                                    message.channel.send(messages.ALIAS_CHANNEL_NOBODY);
+                                                    break;
+
+                                                case false:
+                                                    message.channel.send(messages.ERROR);
+                                                    break;
+
+                                                case true:
+
+                                                    message.channel.send(messages.ALIAS_LIST);
+                                                    for(let key in data) {
+                                                        /** @param {{alias: string}} data[key] */
+                                                        if(data.hasOwnProperty(key)) message.channel.send(data[key].alias.toString());
+                                                    }
+                                            }
+                                        })
+                                    }
 
                             }
 
@@ -340,6 +370,23 @@ bot.on('message', message => {
                 message.delete(0);
                 break;
             }
+            break;
+
+        case "!test":
+            if(!args[0]) message.channel.send(messages.ARGUMENT_NOBODY.replace("%1", "1"));
+            else {
+                switch(args[0]){
+                    case "msg":
+                        if(!args[1]) message.channel.send(messages.ARGUMENT_NOBODY.replace("%1", "2"));
+                        else if(!messages[args[1]]) message.channel.send(messages.TEST_MSG_NOBODY);
+                        else {
+                            message.author.send(messages[args[1].toUpperCase()]);
+                            message.channel.send(messages.DM_SEND)
+                        }
+                }
+            }
+            break;
+
     }
 
 

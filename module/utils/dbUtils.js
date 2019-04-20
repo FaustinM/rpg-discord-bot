@@ -80,13 +80,23 @@ module.exports = {
         })
     },
 
-    findAlias : function(alias, callback) {
+    findChannel : function(alias, callback) {
         this.client.db(config.NAME_DB).collection("aliasChannel").findOne({"alias" : alias}, (err, rsp) => {
             if(err) {
                 console.error(err);
                 callback(false);
             } else if(!rsp) callback("nobody");
             else if(rsp) callback(true, rsp.channelId);
+        })
+    },
+
+    findAlias : function(channel, callback) {
+        this.client.db(config.NAME_DB).collection("aliasChannel").find({"channelId" : channel}).toArray((err, rsp) => {
+            if(err) {
+                console.error(err);
+                callback(false);
+            } else if(rsp.length === 0) callback("nobody");
+            else if(rsp) callback(true, rsp);
         })
     },
 
