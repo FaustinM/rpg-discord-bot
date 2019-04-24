@@ -121,7 +121,7 @@ bot.on('message', message => {
         })
     } else if(message.content === "J'adore Raenias !") {
         if(!message.guild){
-            formUtils.startForm(bot, forms.join[0], message)
+            formUtils.sendForm(bot, forms.join, message);
         } else {
             message.delete(0);
         }
@@ -412,5 +412,13 @@ bot.on('message', message => {
 
 });
 
+process.on('SIGINT', function() {
+    bot.destroy().catch((err) => {
+        console.error(err);
+    });
+    dbUtils.client.close();
+});
+
 bot.login(TOKEN);
+
 
