@@ -2,10 +2,14 @@ const Discord = require('discord.js');
 const config = require('./module/variable/config');
 const disUtils = require('./module/utils/discordUtils');
 let dbUtils = require('./module/utils/dbUtils');
+let formUtils = require('./module/utils/form');
 const embedVar = {
     help : require('./module/variable/help'),
 };
 
+const forms = {
+    join : require("./module/variable/joinForm"),
+}
 const userCommands = require('./module/variable/userCommand');
 const messages = require('./module/variable/message');
 const bot = new Discord.Client();
@@ -74,6 +78,9 @@ bot.on('message', message => {
     const command = args.shift().toLowerCase();
 
     if(message.content.startsWith("*sors pour aller à") && message.content.endsWith("*")) {
+        if(!message.guild) {
+            message.channel.send(messages.DM_BLOCK);
+        }
         const lieu = message.content.substring(19, message.content.length - 1).toLowerCase();
         const lieuC = message.guild.channels.find(channel => channel.name === lieu) || message.guild.channels.get(lieu);
         if(lieuC) {
@@ -94,6 +101,9 @@ bot.on('message', message => {
             })
         }
     } else if(userCommands.money.includes(message.content)) {
+        if(!message.guild) {
+            message.channel.send(messages.DM_BLOCK);
+        }
         dbUtils.checkMoney(message.author.id, (rsp, money) => {
             switch(rsp) {
                 case true:
@@ -109,13 +119,19 @@ bot.on('message', message => {
                     break;
             }
         })
+    } else if(message.content === "J'adore Raenias !") {
+        if(!message.guild){
+            formUtils.startForm(bot, forms.join[0], message)
+        } else {
+            message.delete(0);
+        }
     }
 
     switch(command) {
         default:
             break;
         case "!channel":
-            if(!message.guild.available) {
+            if(!message.guild) {
                 message.channel.send(messages.DM_BLOCK);
                 break;
             }
@@ -239,6 +255,10 @@ bot.on('message', message => {
             }
             break;
         case "!move":
+            if(!message.guild) {
+                message.channel.send(messages.DM_BLOCK);
+                break;
+            }
             if(message.member.permissions.has("ADMINISTRATOR")) {
                 const user = message.guild.members.get(args[0]) || message.guild.members.find(user => user.nickname === args[0]) || message.guild.members.get(disUtils.getChannel(args[0]));
                 const dest = message.guild.channels.get(args[1]) || message.guild.channels.find(channel => channel.name === args[1]) || message.guild.channels.get(disUtils.getChannel(args[1]));
@@ -267,7 +287,7 @@ bot.on('message', message => {
         case "!money":
             let user;
             let nbMoney;
-            if(!message.guild.available) {
+            if(!message.guild) {
                 message.channel.send(messages.DM_BLOCK);
                 break;
             }
