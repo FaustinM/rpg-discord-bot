@@ -96,11 +96,11 @@ bot.on('message', message => {
         default:
             break;
         case "!channel":
-            commands.channel(args, dbUtils);
+            commands.channel.code(args, dbUtils);
             break;
 
         case "!move":
-            commands.move(message, args);
+            commands.move.code(message, args);
             break;
 
         case "!help":
@@ -113,11 +113,11 @@ bot.on('message', message => {
             break;
 
         case "!money":
-            commands.money(dbUtils, message, args);
+            commands.money.code(dbUtils, message, args);
             break;
 
         case "!debug":
-            commands.debug(args, message, bot);
+            commands.debug.code(args, message, bot);
             break;
 
     }
