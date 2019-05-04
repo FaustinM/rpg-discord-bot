@@ -5,7 +5,7 @@ const config = require('../variable/config');
 module.exports = {
     client : new MongoClient(process.env.URI || config.URL_DB),
 
-    checkRole : function(id, callback){
+    checkRole : function(id, callback) {
         this.client.db(config.NAME_DB).collection("Channel").findOne({"channelId" : id}, (err, rsp) => {
             if(err) {
                 console.error(err);
@@ -14,7 +14,7 @@ module.exports = {
             else if(rsp) callback(true, rsp.role);
         });
     },
-    
+
     addRole : function(channel, role, callback) {
         this.client.db(config.NAME_DB).collection("Channel").findOne({channelId : channel}, (err, rsp) => {
             if(err) {
@@ -50,7 +50,7 @@ module.exports = {
         });
     },
 
-    addAlias: function(channelId, alias, callback) {
+    addAlias : function(channelId, alias, callback) {
         if(alias === "" || alias === " " || !alias) {
             callback("nobody");
         } else {
@@ -129,7 +129,7 @@ module.exports = {
                     }
                 })
             } else if(!rsp) {
-                if(money < 0){
+                if(money < 0) {
                     callback("nobody");
                     return;
                 }
@@ -148,7 +148,7 @@ module.exports = {
         });
     },
 
-    setMoney : function(user, money, callback){
+    setMoney : function(user, money, callback) {
         this.client.db(config.NAME_DB).collection("player").findOne({userId : user}, (err, rsp) => {
             if(err) {
                 console.error(err);
@@ -167,7 +167,7 @@ module.exports = {
                     }
                 })
             } else if(!rsp) {
-                if(money < 0){
+                if(money < 0) {
                     callback("nobody");
                     return;
                 }
