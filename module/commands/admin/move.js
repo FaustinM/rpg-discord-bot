@@ -1,5 +1,5 @@
 const messages = require('../../variable/message');
-module.exports = function(message, args) {
+module.exports = function(args, message) {
     if(!message.guild) {
         message.channel.send(messages.DM_BLOCK);
     }
@@ -18,4 +18,4 @@ module.exports = function(message, args) {
     } else {
         message.delete(0);
     }
-}
+};

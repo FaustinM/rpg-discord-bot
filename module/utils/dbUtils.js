@@ -1,5 +1,5 @@
 const MongoClient = require("mongodb").MongoClient;
-const config = require('../variable/config');
+const config = require('../core/config');
 
 
 module.exports = {

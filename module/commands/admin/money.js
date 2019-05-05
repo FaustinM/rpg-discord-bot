@@ -6,7 +6,7 @@ const bal = require('./money/bal');
 const remove = require('./money/remove');
 const add = require('./money/add');
 
-module.exports = function(dbUtils, message, args) {
+module.exports = function(args, message, dbUtils) {
     if(!message.guild) {
         message.channel.send(messages.DM_BLOCK);
     } else if(message.member.permissions.has("ADMINISTRATOR")) {

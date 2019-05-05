@@ -1,8 +1,12 @@
 const Discord = require('discord.js');
 
+const manager = require("./module/core/gestionCommands");
+const config = require('./module/core/config');
+
+const gestionCommand = require('./module/commands/admin/gestion');
+
 const userAlias = require('./module/variable/userCommand');
 const messages = require('./module/variable/message');
-const config = require('./module/variable/config');
 
 const changeChannel = require('./module/utils/channel');
 let dbUtils = require('./module/utils/dbUtils');
@@ -14,7 +18,6 @@ const embedVar = {
 const forms = {
     join : require("./module/variable/joinForm"),
 };
-const commands = require("./module/core/composants")
 
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
@@ -39,7 +42,7 @@ dbUtils.client.connect(function(error) {
 });
 
 bot.on('message', message => {
-    const args = message.content.split(' ');
+    const args = message.content.toLowerCase().split(' ');
     const command = args.shift().toLowerCase();
 
     if(message.content.startsWith("*sors pour aller à") && message.content.endsWith("*")) {
@@ -90,39 +93,33 @@ bot.on('message', message => {
         } else {
             message.delete(0);
         }
-    }
+    } else {
+        for(let key in manager.commands) {
+            if(manager.commands.hasOwnProperty(key) && command === config.PREFIX + manager.commands[key].name) {
+                if(!manager.commands[key].msg && !message.guild){
+                    message.channel.send(messages.DM_BLOCK);
+                    break;
+                }
+                switch(manager.state(manager.commands[key].name)) {
+                    default :
+                        break;
 
-    switch(command) {
-        default:
-            break;
-        case "!channel":
-            commands.channel.code(args, dbUtils);
-            break;
+                    case "error":
+                        message.channel.send(messages.COMMANDS_ERROR);
+                        break;
 
-        case "!move":
-            commands.move.code(message, args);
-            break;
+                    case false:
+                        message.channel.send(messages.COMMANDS_OFF);
+                        break;
 
-        case "!help":
-            if(!message.guild) message.channel.send(messages.DM_BLOCK);
-            if(message.member.permissions.has("ADMINISTRATOR")) {
-                message.reply({embed : embedVar.help});
-            } else {
-                message.delete(0);
+                    case true:
+                        manager.commands[key].code(args, message, dbUtils, bot);
+                }
+                break;
             }
-            break;
-
-        case "!money":
-            commands.money.code(dbUtils, message, args);
-            break;
-
-        case "!debug":
-            commands.debug.code(args, message, bot);
-            break;
-
+        }
     }
-
-
+    if(command === "!gestion") gestionCommand(args, message, manager);
 });
 
 process.on('SIGINT', function() {
@@ -139,5 +136,5 @@ process.on('SIGTERM', function() {
 });
 
 bot.login(TOKEN);
-
+manager.load();
 

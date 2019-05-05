@@ -17,4 +17,4 @@ module.exports = function(destination, msg, dbUtils) {
                 }
         }
     }, msg);
-}
+};

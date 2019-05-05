@@ -1,11 +1,7 @@
 messages = require('../../variable/message.js');
 disUtils = require('../../utils/discordUtils.js');
 
-module.exports = function(args, dbUtils) {
-    if(!message.guild) {
-        message.channel.send(messages.DM_BLOCK);
-        return;
-    }
+module.exports = function(args, message, dbUtils) {
     if(args.length > 0 && message.member.permissions.has("ADMINISTRATOR")) {
         let channelID;
         let channelArgs;

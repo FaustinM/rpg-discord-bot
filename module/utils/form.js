@@ -40,7 +40,7 @@ module.exports = {
             /** @param {{lenght: number}} form */
             if(!form[this.forms[message.author.id].reponse.length]) {
                 message.channel.send(messages.FICHE_SEND);
-                return;
+
             } else if("goe") {
 
             }

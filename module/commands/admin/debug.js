@@ -1,10 +1,10 @@
 messages = require('../../variable/message.js');
 debugEmbed = require('../../variable/debugEmbed');
 date = require('../../utils/date');
-config = require('../../variable/config');
+config = require('../../core/config');
 os = require('os');
 
-module.exports = function(args, message, bot) {
+module.exports = function(args, message, dbUtils, bot) {
     if(!message.guild) message.channel.send(messages.DM_BLOCK);
     else if(!message.member.permissions.has("ADMINISTRATOR")) message.delete(0);
     else if(!args[0]) message.channel.send(messages.ARGUMENT_NOBODY.replace("%1", "1"));

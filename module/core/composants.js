@@ -1,22 +1,39 @@
 module.exports = {
     debug : {
-        code : require("../commands/admin/debug"),
+        path : "../commands/admin/debug",
+        code : function() {
+            console.log("Composant mal gérée !" + this.name)
+        },
         use : true,
-        name : "debug"
+        name : "debug",
+        msg : false,
     },
     channel : {
-        code : require("../commands/admin/channel"),
+        path : "../commands/admin/channel",
+        code : function() {
+            console.log("Composant mal gérée !" + this.name)
+        },
         use : true,
-        name : "channel"
+        name : "channel",
+        msg : false,
     },
     move : {
-        code : require("../commands/admin/move"),
+        path : "../commands/admin/move",
+        code : function() {
+            console.log("Composant mal gérée !" + this.name)
+        },
         use : true,
-        name : "move"
+        name : "move",
+        msg : false,
     },
     money : {
-        code : require("../commands/admin/money"),
+        path : "../commands/admin/money",
+        code : function() {
+            console.log("Composant mal gérée !" + this.name)
+        },
         use : true,
-        name : "money"
+        name : "money",
+        msg : false,
     },
+
 };

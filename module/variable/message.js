@@ -33,5 +33,14 @@ module.exports = {
     MONEY_SELL : "Vous donnez %1 à la bourse de %2",
     MONEY_NEGATIVE_ADMIN : ":warning: Le compte de %1 ne peux pas être négatif avant sa création ! En cas de force majeur, contactez-moi : <@140123457001226241>",
     USER_INVALID : ":frowning2: L'utilisateur n'existe pas !",
-    OWNER_INVALID : ":frowning2: Vous n'êtes pas le propriétaire du bot ! Merci de contacter <@140123457001226241>"
+    OWNER_INVALID : ":frowning2: Vous n'êtes pas le propriétaire du bot ! Merci de contacter <@140123457001226241>",
+    COMMANDS_ERROR : ":frowning2: Une erreur rencontre une erreur...",
+    COMMANDS_ON : ":tools: La commande à été activé",
+    COMMANDS_NOBODY : ":frowning2: La commande n'existe pas...",
+    COMMANDS_OFF : ":frowning2: La commande à été désactivé ...",
+    COMMANDS_OFF_ACTION : ":tools: La commande à bien été désactivé ...",
+    COMMANDS_RELOAD : ":tools: Toutes les commandes ont été rechargée",
+    COMMANDS_LIST_ON : ":white_check_mark: En fonctionnement",
+    COMMANDS_LIST_OFF : ":x: En arrêt",
+    COMMANDS_LIST_ERROR : ":frowning2: En erreur",
 };
