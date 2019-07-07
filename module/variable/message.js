@@ -1,3 +1,8 @@
+/**
+ * @file Liste des messages envoyé à l'utilisateur
+ * @author Faustin
+ * @readonly
+ */
 module.exports = {
     ERROR : ":frowning2: Une erreur inconnue est survenue...",
     JOIN : "\u200B      Bonjour jeune voyageur, et bienvenue sur le serveur RP Raenias, je suis le Gardiens Des Clefs de Libertown et aussi votre assistant. Pour bien débuter, je vous conseil de lire les règles que vous acceptez bien évidement. Par la suite, je vous encourage à prendre connaissance de l'histoire de Raenias (<#495509529719603211>).\n\n     Raenias compte 5 grandes races ainsi que le peuple des humains géré par le grand <@436431337944252417> qui est le Chancelier de Libertown ! Je vais maintenant vous parler des autres classes !\n\n     Pour avoir la liste des différents roles, allez dans le channel <#556397156030742528>. Pour vous faire une bonne idée de la meilleure faction, lisez les channels sur l'histoire, les sous-races ainsi que le chef de chaque faction.\n\n     Une fois l'histoire de Raenias sur le bout des doigt, vous pourrez commencer l'élaboration de votre fiche. Le Chroniqueur vous a commencer le travail en vous expliquant ce système !\n\n     Enfin, quand le moment sera venu, je vous assisterez dans la création de votre fiche. Pour m'avertir, envoyez moi simplement `J'adore Raenias !`",
@@ -5,6 +10,16 @@ module.exports = {
     ARGUMENT_NOBODY : ":frowning2: L'argument %1 n'existe pas...",
     FICHE_START : "\u200B      Ah, vous voilà, je vous attendez ! Bon, voici le fonctionnement de formulaire pour crée votre fiche : Je vais vous posez différentes questions, et la fin de chaque question, je vous dirais si une réaction est attendu ou un message écrit !",
     FICHE_SEND : "C'est bon ! Vous avez répondu avec bravoure à toutes les questions avec bravoures ! Votre fiche va être maintenant envoyé aux Administrateurs !",
+    FICHE_ACCEPT : "Après de longues réflexions, votre fiche est accepté au sein de notre communauté !",
+    FICHE_NEW : ":notepad_spiral: La fiche de %1 à bien été créée dans la base de donnée !",
+    FICHE_NEW_TWO : ":frowning2: La fiche de %1 ne peux pas être crée car il en existe une autre en vie...",
+    FICHE_LIST_NOBODY : ":frowning2: Aucune fiche pour %1 n'a été trouvée...",
+    FICHE_ACTIVE_NOBODY : ":frowning2: Aucune fiche active pour %1 n'a été trouvée...",
+    FICHE_MODIFY_ELEMENT : ":frowning2: Cet élément n'est pas modifiable...",
+    FICHE_MODIFY : ":notepad_spiral: La fiche a été modifié avec succès !",
+    FICHE_MORT_TIME : ":frowning2: Vous avez refusez la mort de la fiche de %1",
+    FICHE_MORT_CHECK : ":hourglass: Veillez confirmer la mort de %1",
+    FICHE_MORT : ":notepad_spiral: La fiche de %1 est maintenant considéré comme morte !",
     TEST_MSG_NOBODY : ":frowning2: [TEST] Le message demandé n'existe pas...",
     DM_BLOCK : ":frowning2: Malheureusement, j'ai l'impression que vous n'êtes pas dans un serveur Discord...",
     DM_SEND : ":mailbox_with_mail: Je vous est envoyé un DM !",
@@ -21,6 +36,13 @@ module.exports = {
     ROLE_DEFINE : ":tools: Le rôle %1 à été défini pour le channel : %2",
     ROLE_MODIFY : ":tools: Le rôle %1 à été modifié pour le channel : %2",
     LOG_MOVE : "Changement de channel (RP)",
+    METIER_INVALID : ":frowning2: Le métier n'est pas valide !",
+    METIER_DELETE : ":notepad_spiral: Ce métier à bien été supprimé",
+    METIER_CREATE : ":notepad_spiral: Ce métier à bien été crée",
+    METIER_CREATE_TWO : ":notepad_spiral: Ce métier existe déjà",
+    METIER_MODIFY_ELEMENT : ":frowning2: Cet élément n'est pas modifiable...",
+    METIER_MODIFY : ":notepad_spiral: Cet élément à bien été modifié",
+    METIER_LIST_NOBODY : ":frowning2: Aucun métier n'existe...",
     MONEY_START : "%1 vous donne à tire exceptionnel %2 pour commencer votre aventure",
     MONEY_NOBODY_OTHER : ":frowning2: Aucun compte au nom de %1 n'existe...",
     MONEY_NOBODY : ":frowning2: Aucun compte à votre nom n'existe...",

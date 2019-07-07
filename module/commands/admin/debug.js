@@ -1,5 +1,5 @@
 messages = require('../../variable/message.js');
-debugEmbed = require('../../variable/debugEmbed');
+debugEmbed = require('../../variable/embed/debugEmbed');
 date = require('../../utils/date');
 config = require('../../core/config');
 os = require('os');

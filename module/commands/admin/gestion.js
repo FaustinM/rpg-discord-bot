@@ -9,7 +9,7 @@ module.exports = function(args, message, commands) {
                 break;
 
             case "statut":
-                switch(commands.state(args[1])) {
+                switch(commands.state(args[2], args[1])) {
                     default:
                         break;
 
@@ -32,7 +32,7 @@ module.exports = function(args, message, commands) {
                 break;
 
             case "off":
-                switch(commands.disable(args[1])) {
+                switch(commands.disable(args[2], args[1])) {
                     default:
                         break;
 
@@ -51,7 +51,7 @@ module.exports = function(args, message, commands) {
                 break;
 
             case "on":
-                switch(commands.enable(args[1])) {
+                switch(commands.enable(args[2], args[1])) {
                     default:
                         break;
 
@@ -80,26 +80,28 @@ module.exports = function(args, message, commands) {
                 embed.setTitle("Liste des commandes !");
                 embed.setColor("#FF0000");
                 embed.setTimestamp();
-                for(let key in commands.commands) {
-                    const name = commands.commands[key].name.charAt(0).toUpperCase() + commands.commands[key].name.slice(1);
-                    switch(commands.commands[key].use) {
-                        default:
-                            break;
+                for(let key in commands.commands){
+                    const keyName = key.charAt(0).toUpperCase() + key.slice(1)
+                    for(let key1 in commands.commands[key]) {
+                        const name = commands.commands[key][key1].name.charAt(0).toUpperCase() + commands.commands[key][key1].name.slice(1);
+                        switch(commands.commands[key][key1].use) {
+                            default:
+                                break;
 
-                        case true:
-                            embed.addField(name, messages.COMMANDS_LIST_ON, true);
-                            break;
+                            case true:
+                                embed.addField(name + " - " + keyName, messages.COMMANDS_LIST_ON, true);
+                                break;
 
-                        case false:
-                            embed.addField(name, messages.COMMANDS_LIST_OFF, true);
-                            break;
+                            case false:
+                                embed.addField(name + " - " + keyName, messages.COMMANDS_LIST_OFF, true);
+                                break;
 
-                        case "error":
-                            embed.addField(name, messages.COMMANDS_LIST_ERROR, true);
-                            break;
+                            case "error":
+                                embed.addField(name + " - " + keyName, messages.COMMANDS_LIST_ERROR, true);
+                                break;
+                        }
                     }
                 }
-
                 message.channel.send({embed});
         }
     }

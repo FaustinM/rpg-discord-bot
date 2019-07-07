@@ -1,5 +1,4 @@
 const messages = require('../../variable/message');
-const disUtils = require('../../utils/discordUtils');
 
 const reset = require('./money/reset');
 const bal = require('./money/bal');

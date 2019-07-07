@@ -1,4 +1,4 @@
-let modele = require("../variable/formEmbed");
+let modele = require("../variable/embed/formEmbed");
 let messages = require("../variable/message");
 
 module.exports = {

@@ -9,11 +9,13 @@
   "author": "Faustin_",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.4.2",
-    "fs": "0.0.1-security",
+    "@sentry/node": "^5.4.3",
+    "discord.js": "^11.5.1",
+    "fs": "0.0.2",
     "json": "^9.0.6",
-    "mongodb": "^3.2.3",
-    "npm": "^6.9.0",
+    "mongodb": "^3.2.7",
+    "npm": "^6.10.0",
+    "ora": "^3.4.0",
     "pm2-api": "0.0.4"
   }
 }

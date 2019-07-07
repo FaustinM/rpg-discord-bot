@@ -1,106 +1,102 @@
-const Discord = require('discord.js');
+// Librairie
+const Discord = require("discord.js");
+const Sentry = require("@sentry/node");
+const Ora = require("ora");
 
+// Core Module
 const manager = require("./module/core/gestionCommands");
-const config = require('./module/core/config');
+const config = require("./module/core/config");
 
-const gestionCommand = require('./module/commands/admin/gestion');
+// Module de gestion de commande
+const gestionCommands = require("./module/commands/admin/gestion");
 
-const userAlias = require('./module/variable/userCommand');
-const messages = require('./module/variable/message');
+// Fichiers de constantes
+const messages = require("./module/variable/message");
 
-const changeChannel = require('./module/utils/channel');
-let dbUtils = require('./module/utils/dbUtils');
-//let formUtils = require('./module/utils/form');
+// Fichiers utilitaire
+let dbUtils = require("./module/utils/dbUtils");
 
-const embedVar = {
-    help : require('./module/variable/help'),
-};
+/*WIP
+let formUtils = require("./module/utils/form");
 const forms = {
     join : require("./module/variable/joinForm"),
-};
+};*/
 
+// Constantes
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
 
-bot.on('ready', function() {
-    console.log("Je suis connecté !");
+// Initialisation de Sentry
+Sentry.init({
+    dsn: "https://b91af35fb49d43518e46bda9b2a14db1@sentry.io/1496886",
+
 });
 
-bot.on('guildMemberAdd', (member) => {
+// Gestion des événement du bot
+bot.on("ready", function() {
+    spinners.discord.succeed("Connecté à l'api Discord !");
+});
+
+bot.on("guildMemberAdd", (member) => {
     if(!member.user.bot) {
         member.send(messages.JOIN);
     }
 });
 
-dbUtils.client.connect(function(error) {
-    if(error) throw error;
-    dbUtils.client.db(config.NAME_DB);
-    console.log("Connecté à la base de donnée du bot");
-    console.log("Nombre de fiche : " + dbUtils.client.db(config.NAME_DB).collection("Fiche").estimatedDocumentCount({}, (err, num) => {
-        return num
-    }))
-});
+bot.on("message", message => {
+    // Gestionnaire de commandes utilisateurs
+    if(message.content.startsWith("*") && message.content.endsWith("*")) {
+        let command = message.content.slice(1, -1);
+        for(let key in manager.commands.rp) {
+            if(manager.commands.rp.hasOwnProperty(key)) for(let key2 in manager.commands.rp[key].regs) {
+                if(manager.commands.rp[key].regs.hasOwnProperty(key2) && command.match(manager.commands.rp[key].regs[key2])) {
 
-bot.on('message', message => {
-    const args = message.content.toLowerCase().split(' ');
-    const command = args.shift().toLowerCase();
+                    Sentry.configureScope((scope) => {
+                        scope.setUser({"username": message.author.tag});
+                        scope.setTag("module", manager.commands.rp[key].name);
+                        scope.setTag("role", "user")
+                    });
 
-    if(message.content.startsWith("*sors pour aller à") && message.content.endsWith("*")) {
-        if(!message.guild) {
-            message.channel.send(messages.DM_BLOCK);
-        }
-        const lieu = message.content.substring(19, message.content.length - 1).toLowerCase();
-        const lieuC = message.guild.channels.find(channel => channel.name === lieu) || message.guild.channels.get(lieu);
-        if(lieuC) {
-            changeChannel(lieuC, message, dbUtils);
-        } else {
-            dbUtils.findChannel(lieu, (data, rsp) => {
-                const aliasDest = message.guild.channels.get(rsp);
-                switch(data) {
-                    case false:
-                        message.delete(0);
+                    if(!manager.commands.rp[key].msg && !message.guild) {
                         break;
-                    case true:
-                        changeChannel(aliasDest, message, dbUtils);
-                        break;
-                    case "nobody":
-                        message.delete(0);
+                    }
+                    switch(manager.state(manager.commands.rp[key].name, "rp")) {
+                        case "error":
+                            message.channel.send(messages.COMMANDS_ERROR);
+                            break;
+
+                        case false:
+                            message.channel.send(messages.COMMANDS_OFF);
+                            break;
+
+                        case true:
+                            manager.commands.rp[key].code(message, dbUtils, bot);
+                             manager.commands.rp[key].code(message, dbUtils, bot);
+                    }
+                    break;
                 }
-            })
-        }
-    } else if(userAlias.money.includes(message.content)) {
-        if(!message.guild) {
-            message.channel.send(messages.DM_BLOCK);
-        }
-        dbUtils.checkMoney(message.author.id, (rsp, money) => {
-            switch(rsp) {
-                case true:
-                    message.author.send(messages.MONEY_BALANCE.replace("%1", money));
-                    break;
-
-                case false:
-                    message.delete(0);
-                    break;
-
-                case "nobody":
-                    message.author.send(messages.MONEY_NOBODY);
-                    break;
             }
-        })
-    } else if(message.content === "J'adore Raenias !") {
-        if(!message.guild) {
-            //formUtils.sendForm(bot, forms.join, message);
-        } else {
-            message.delete(0);
         }
     } else {
-        for(let key in manager.commands) {
-            if(manager.commands.hasOwnProperty(key) && command === config.PREFIX + manager.commands[key].name) {
-                if(!manager.commands[key].msg && !message.guild){
+        // Gestionnaire de commandes administrateurs
+
+        const args = message.content.toLowerCase().split(" ");
+        const command = args.shift().toLowerCase();
+        for(let key in manager.commands.admin) {
+
+            if(manager.commands.admin.hasOwnProperty(key) && command === config.PREFIX + manager.commands.admin[key].name) {
+                Sentry.configureScope((scope) => {
+                    scope.setUser({"username": message.author.tag});
+                    scope.setTag("module", manager.commands.admin[key].name);
+                    scope.setTag("role", "admin")
+                });
+
+
+                if(!manager.commands.admin[key].msg && !message.guild) {
                     message.channel.send(messages.DM_BLOCK);
                     break;
                 }
-                switch(manager.state(manager.commands[key].name)) {
+                switch(manager.state(manager.commands.admin[key].name, "admin")) {
                     default :
                         break;
 
@@ -113,28 +109,61 @@ bot.on('message', message => {
                         break;
 
                     case true:
-                        manager.commands[key].code(args, message, dbUtils, bot);
+                        manager.commands.admin[key].code(args, message, dbUtils, bot);
                 }
                 break;
             }
         }
+        if(command === "!gestion") gestionCommands(args, message, manager);
     }
-    if(command === "!gestion") gestionCommand(args, message, manager);
+
 });
 
-process.on('SIGINT', function() {
+// Gestion des événements d'arrets
+process.on("SIGINT", function() {
     bot.destroy().catch((err) => {
         console.error(err);
     });
     dbUtils.client.close();
 });
-process.on('SIGTERM', function() {
+process.on("SIGTERM", function() {
     bot.destroy().catch((err) => {
         console.error(err);
     });
     dbUtils.client.close();
 });
+// Initialisation
+const spinners = {
+    dbS : new Ora("Connexion à la base de donnée"),
+    verification : new Ora("Vérification des variables d'environement").start(),
+    discord : new Ora("Connexion à l'api Discord"),
+};
 
-bot.login(TOKEN);
+if(!TOKEN || !(process.env.URI || config.URL_DB)){
+    spinners.verification.fail("Erreur lors de la vérification des données !");
+    process.exit(78); // Code : Problème à la vérification
+} else if(!process.env.SENTRY_DSN) {
+    spinners.verification.warn("Le token de sentry n'est pas trouvable");
+} else {
+    spinners.verification.succeed("Toutes les données sont disponible !")
+}
+
+dbUtils.client.connect(function(error) {
+    if(error){
+        Sentry.captureException(error);
+        spinners.dbS.fail("Erreur lors de la connexion à la base de donnée...");
+        process.exit(1); // Code : Problème à la connexion à la DB
+    }
+    dbUtils.createPayMetier();
+    spinners.dbS.succeed("Connecté à la base de donnée !");
+
+});
+
+bot.login(TOKEN).catch((error) => {
+    Sentry.captureException(error);
+    spinners.discord.fail("Erreur lors de la connexion à Discord...");
+    process.exit(1); // Code : Problème à la connexion à Discord
+});
 manager.load();
+
 

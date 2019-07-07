@@ -1,3 +1,3 @@
 module.exports = {
-    money : ["*ouvre sa bourse*", "*regarde son portefeuille*", "*compte ses sous*", "*reagrde ses comptes*", "*reagrde son argent*", "*ouvre son portefeuille*"]
+    money : ["^ouvre sa bourse$", "^regarde son portefeuille$", "^compte ses sous$", "^regarde ses comptes$", "^regarde son argent$", "^ouvre son portefeuille$"]
 };

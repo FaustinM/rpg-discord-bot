@@ -1,4 +1,3 @@
-const money = require('../../../utils/money');
 const messages = require('../../../variable/message.js');
 const disUtils = require('../../../utils/discordUtils.js');
 
@@ -8,6 +7,20 @@ module.exports = function(dbUtils, args, message) {
     if(!user) {
         message.channel.send(messages.USER_INVALID);
     } else {
-        money.start(user, dbUtils);
+        dbUtils.setMoney(user.id, 300, (data) => {
+            switch(data) {
+                case "nobody" :
+                    user.send(messages.MONEY_START.replace("%1", "Libertown").replace("%2", "300"));
+                    break;
+
+                case "modify" :
+                    user.send(messages.MONEY_START.replace("%1", "Libertown").replace("%2", "300"));
+                    break;
+
+                case false:
+                    console.error(user.id + " : Erreur lors du don de début !");
+                    break;
+            }
+        })
     }
 };
