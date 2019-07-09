@@ -1,10 +1,8 @@
 const messages = require('../../../variable/message');
-const disUtils = require('../../../utils/discordUtils');
-const listEmbed = require('../../../variable/embed/fiches');
 
 element = ["earn", "time"];
 
-module.exports = function(args, message, dbUtils) {
+module.exports = function(args, message, dbUtils, bot) {
     if(!element.includes(args[2])) {
         message.channel.send(messages.METIER_MODIFY_ELEMENT);
     } else {
@@ -19,7 +17,11 @@ module.exports = function(args, message, dbUtils) {
                     break;
 
                 case "modify":
-                    message.channel.send(messages.METIER_MODIFY)
+                    message.channel.send(messages.METIER_MODIFY);
+                    if(args[2] === "time"){
+                        clearTimeout(dbUtils.metierPay[args[1]]);
+                        dbUtils.infoMetier(args[1], (value, rsp2) => dbUtils.createTimeoutPay(rsp2[0], bot));
+                    }
             }
         })
     }

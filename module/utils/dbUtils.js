@@ -1,6 +1,7 @@
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const config = require('../core/config');
+const message = require('../variable/message');
 
 
 module.exports = {
@@ -292,15 +293,15 @@ module.exports = {
             }
         });
     },
-    createPayMetier : function(){
+    createPayMetier : function(bot){
         this.findMetiers((code, res) => {
             switch(code){
                 default:
-                    break;
+                        break;
 
                 case true:
                     for(let key in res){ //Création d'un setTimeout pour tous les métiers
-                        if(res.hasOwnProperty(key)) this.createTimeoutPay(res[key])
+                        if(res.hasOwnProperty(key)) this.createTimeoutPay(res[key], bot)
                     }
                     break;
 
@@ -310,7 +311,7 @@ module.exports = {
             }
         })
     },
-    createTimeoutPay : function(data){
+    createTimeoutPay : function(data, bot){
         let that = this;
         this.metierPay[data.name] = setTimeout(function(){
             that.queryFiche("metier", data.name,  function(code2, res2){
@@ -320,7 +321,11 @@ module.exports = {
 
                     case true:
                         for(let key2 in res2) {
-                            if(res2.hasOwnProperty(key2)) that.modifyMoney(res2[key2].user, parseInt(data.earn), () =>{})
+                            if(res2.hasOwnProperty(key2)) {
+                                const user = bot.users.get(res2[key2].user);
+                                user.send(message.METIER_PAY.replace("%1", data.earn).replace("%2", data.name));
+                                that.modifyMoney(res2[key2].user, parseInt(data.earn), () =>{})
+                            }
                         }
                         break;
 
@@ -335,7 +340,7 @@ module.exports = {
                         break;
 
                     case true:
-                        that.createTimeoutPay(res[0]);
+                        that.createTimeoutPay(res[0], bot);
                         break;
 
                     case "nobody":

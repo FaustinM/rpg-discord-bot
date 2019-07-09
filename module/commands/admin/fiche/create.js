@@ -24,7 +24,6 @@ module.exports = function(args, message, dbUtils){
 
                 case "two" :
                     message.channel.send(messages.FICHE_NEW_TWO.replace("%1", user.displayName));
-                    user.send(messages.FICHE_ACCEPT);
                     break;
 
                 case false:

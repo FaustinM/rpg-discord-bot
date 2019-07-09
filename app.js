@@ -23,18 +23,19 @@ const forms = {
 };*/
 
 // Constantes
-const bot = new Discord.Client();
+const bot = new Discord.Client({fetchAllMembers : true});
 const TOKEN = process.env.TOKEN;
 
 // Initialisation de Sentry
 Sentry.init({
-    dsn: "https://b91af35fb49d43518e46bda9b2a14db1@sentry.io/1496886",
+    dsn: process.env.SENTRY_DSN,
 
 });
 
-// Gestion des événement du bot
+// Gestion des événements du bot
 bot.on("ready", function() {
     spinners.discord.succeed("Connecté à l'api Discord !");
+    dbUtils.createPayMetier(bot);
 });
 
 bot.on("guildMemberAdd", (member) => {
@@ -121,6 +122,9 @@ bot.on("message", message => {
 
 // Gestion des événements d'arrets
 process.on("SIGINT", function() {
+    for(let key in dbUtils.metierPay){
+        if(dbUtils.metierPay.hasOwnProperty(key)) clearTimeout(dbUtils.metierPay[key]);
+    };
     bot.destroy().catch((err) => {
         console.error(err);
     });
@@ -154,9 +158,7 @@ dbUtils.client.connect(function(error) {
         spinners.dbS.fail("Erreur lors de la connexion à la base de donnée...");
         process.exit(1); // Code : Problème à la connexion à la DB
     }
-    dbUtils.createPayMetier();
     spinners.dbS.succeed("Connecté à la base de donnée !");
-
 });
 
 bot.login(TOKEN).catch((error) => {

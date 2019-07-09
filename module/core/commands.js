@@ -9,6 +9,15 @@ module.exports ={
             name : "debug",
             msg : false,
         },
+        help : {
+            path : "../commands/admin/help",
+            code : function() {
+                console.log("Composant mal gérée !" + this.name)
+            },
+            use : true,
+            name : "help",
+            msg : true,
+        },
         channel : {
             path : "../commands/admin/channel",
             code : function() {
@@ -63,7 +72,6 @@ module.exports ={
             code : require("../commands/user/money/bal"),
             use : true,
             regs : require("../variable/userCommand").money,
-            reg : "money",
             msg : false,
         },
         channel : {

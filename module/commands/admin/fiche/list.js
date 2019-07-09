@@ -3,10 +3,14 @@ const disUtils = require('../../../utils/discordUtils');
 const listEmbed = require('../../../variable/embed/fiches');
 
 module.exports = function(args, message, dbUtils) {
-    dbUtils.findFiche((rsp, data) => {
+    const user = message.guild.members.get(args[1]) || message.guild.members.find(user => user.nickname === args[1]) || message.guild.members.get(disUtils.getChannel(args[1]));
+    if(!user){
+        message.channel.send(messages.USER_INVALID);
+    }
+    dbUtils.findFiche(user.id, (rsp, data) => {
         switch(rsp) {
             case "nobody":
-                message.channel.send(messages.METIER_LIST_NOBODY);
+                message.channel.send(messages.FICHE_LIST_NOBODY.replace("%1", user.id));
                 break;
 
             case false:

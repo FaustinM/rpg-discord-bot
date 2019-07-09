@@ -11,8 +11,7 @@ const disable = require('./fiche/mort');
  *
  * @param {Array} args - Les arguments
  * @param {module:discord.js.Message} message - Le message
- * @param {Object} dbUtils - Object de dbUtils.js
- *
+ * @param {Object} dbUtils - Object de dbUtils.js*
  */
 module.exports = function(args, message, dbUtils) {
     if(message.member.permissions.has("ADMINISTRATOR")) {

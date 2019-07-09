@@ -4,6 +4,7 @@
  * @readonly
  */
 module.exports = {
+    NOT_OBJECTID : ":frowning2: L'argumznt donnée n'est pas un identifiant...",
     ERROR : ":frowning2: Une erreur inconnue est survenue...",
     JOIN : "\u200B      Bonjour jeune voyageur, et bienvenue sur le serveur RP Raenias, je suis le Gardiens Des Clefs de Libertown et aussi votre assistant. Pour bien débuter, je vous conseil de lire les règles que vous acceptez bien évidement. Par la suite, je vous encourage à prendre connaissance de l'histoire de Raenias (<#495509529719603211>).\n\n     Raenias compte 5 grandes races ainsi que le peuple des humains géré par le grand <@436431337944252417> qui est le Chancelier de Libertown ! Je vais maintenant vous parler des autres classes !\n\n     Pour avoir la liste des différents roles, allez dans le channel <#556397156030742528>. Pour vous faire une bonne idée de la meilleure faction, lisez les channels sur l'histoire, les sous-races ainsi que le chef de chaque faction.\n\n     Une fois l'histoire de Raenias sur le bout des doigt, vous pourrez commencer l'élaboration de votre fiche. Le Chroniqueur vous a commencer le travail en vous expliquant ce système !\n\n     Enfin, quand le moment sera venu, je vous assisterez dans la création de votre fiche. Pour m'avertir, envoyez moi simplement `J'adore Raenias !`",
     NAN : ":frowning2: L'argument donné n'est pas un nombre !",
@@ -36,6 +37,7 @@ module.exports = {
     ROLE_DEFINE : ":tools: Le rôle %1 à été défini pour le channel : %2",
     ROLE_MODIFY : ":tools: Le rôle %1 à été modifié pour le channel : %2",
     LOG_MOVE : "Changement de channel (RP)",
+    HELP_NOBODY : ":frowning2: Aucune commande avec ce nom n'a été trouvée",
     METIER_INVALID : ":frowning2: Le métier n'est pas valide !",
     METIER_DELETE : ":notepad_spiral: Ce métier à bien été supprimé",
     METIER_CREATE : ":notepad_spiral: Ce métier à bien été crée",
@@ -43,6 +45,7 @@ module.exports = {
     METIER_MODIFY_ELEMENT : ":frowning2: Cet élément n'est pas modifiable...",
     METIER_MODIFY : ":notepad_spiral: Cet élément à bien été modifié",
     METIER_LIST_NOBODY : ":frowning2: Aucun métier n'existe...",
+    METIER_PAY : ":moneybag: Votre salaire de %1 en tant que %2 vous a été octroyé par Libertown",
     MONEY_START : "%1 vous donne à tire exceptionnel %2 pour commencer votre aventure",
     MONEY_NOBODY_OTHER : ":frowning2: Aucun compte au nom de %1 n'existe...",
     MONEY_NOBODY : ":frowning2: Aucun compte à votre nom n'existe...",
