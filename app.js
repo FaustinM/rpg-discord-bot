@@ -115,7 +115,7 @@ bot.on("message", message => {
                 break;
             }
         }
-        if(command === "!gestion") gestionCommands(args, message, manager);
+        if(command === `${config.PREFIX || '!'}gestion`) gestionCommands(args, message, manager);
     }
 
 });
